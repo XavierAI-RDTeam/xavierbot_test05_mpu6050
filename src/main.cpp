@@ -8,6 +8,9 @@
     #include "Wire.h"
 #endif
 
+#define IMU_SDA 27
+#define IMU_SCL 4
+
 MPU6050 mpu;
 
 #define EARTH_GRAVITY_MS2 9.80665  // m/s2
@@ -32,7 +35,7 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 
 void setup() {
     #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-        Wire.begin();
+        Wire.begin(IMU_SDA, IMU_SCL);
         Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
     #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
         Fastwire::setup(400, true);
@@ -99,11 +102,11 @@ void loop() {
         mpu.dmpGetGyro(&gg, fifoBuffer);
         mpu.dmpConvertToWorldFrame(&ggWorld, &gg, &q);
         Serial.print("ggWorld\t");
-        Serial.print(ggWorld.x * mpu.get_gyro_resolution() * DEG_TO_RAD);
+        Serial.print(ggWorld.x * mpu.get_gyro_resolution());
         Serial.print("\t");
-        Serial.print(ggWorld.y * mpu.get_gyro_resolution() * DEG_TO_RAD);
+        Serial.print(ggWorld.y * mpu.get_gyro_resolution());
         Serial.print("\t");
-        Serial.println(ggWorld.z * mpu.get_gyro_resolution() * DEG_TO_RAD);
+        Serial.println(ggWorld.z * mpu.get_gyro_resolution());
 
         mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
         Serial.print("ypr\t");
